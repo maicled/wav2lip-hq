@@ -42,20 +42,8 @@ def linearspectrogram(wav):
     return S
 
 def melspectrogram(y, sr):
-    # Define mel filterbank parameters
-    n_fft = 1024
-    n_mels = 80
-    hop_length = 256
-
-    # Compute mel-spectrogram using librosa
-    S = librosa.stft(y=y, n_fft=n_fft, hop_length=hop_length)
-    mel_basis = librosa.filters.mel(sr=sr, n_fft=n_fft, n_mels=n_mels)
-    mel_S = np.dot(mel_basis, np.abs(S)**2)
-
-    # Convert to log scale (dB) using the peak power as reference
-    log_mel_S = librosa.power_to_db(mel_S, ref=np.max)
-
-    return log_mel_S
+    S = librosa.feature.melspectrogram(y, sr=sr, n_mels=80, hop_length=256, n_fft=512, fmin=0, fmax=8000)
+    return np.log10(np.maximum(S, 1e-10))
 
 def _lws_processor():
     import lws
