@@ -6,9 +6,9 @@ from scipy import signal
 from scipy.io import wavfile
 from hparams import hparams as hp
 
-def load_wav(file_path):
-    y, sr = librosa.load(file_path)
-    return y, sr
+def load_wav(file_path, sr):
+    y, _ = librosa.load(file_path, sr=sr)
+    return y
 
 def save_wav(wav, path, sr):
     wav *= 32767 / max(0.01, np.max(np.abs(wav)))
