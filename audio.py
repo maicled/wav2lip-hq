@@ -6,8 +6,9 @@ from scipy import signal
 from scipy.io import wavfile
 from hparams import hparams as hp
 
-def load_wav(path, sr):
-    return librosa.core.load(path, sr=sr)[0]
+def load_wav(file_path):
+    y, sr = librosa.load(file_path)
+    return y, sr
 
 def save_wav(wav, path, sr):
     wav *= 32767 / max(0.01, np.max(np.abs(wav)))
@@ -17,10 +18,8 @@ def save_wav(wav, path, sr):
 def save_wavenet_wav(wav, path, sr):
     librosa.output.write_wav(path, wav, sr=sr)
 
-def preemphasis(wav, k, preemphasize=True):
-    if preemphasize:
-        return signal.lfilter([1, -k], [1], wav)
-    return wav
+def preemphasis(y, coeff=0.97):
+    return np.append(y[0], y[1:] - coeff * y[:-1])
 
 def inv_preemphasis(wav, k, inv_preemphasize=True):
     if inv_preemphasize:
@@ -42,13 +41,21 @@ def linearspectrogram(wav):
         return _normalize(S)
     return S
 
-def melspectrogram(wav):
-    D = _stft(preemphasis(wav, hp.preemphasis, hp.preemphasize))
-    S = _amp_to_db(_linear_to_mel(np.abs(D))) - hp.ref_level_db
-    
-    if hp.signal_normalization:
-        return _normalize(S)
-    return S
+def melspectrogram(y, sr):
+    # Define mel filterbank parameters
+    n_fft = 1024
+    n_mels = 80
+    hop_length = 256
+
+    # Compute mel-spectrogram using librosa
+    S = librosa.stft(y=y, n_fft=n_fft, hop_length=hop_length)
+    mel_basis = librosa.filters.mel(sr=sr, n_fft=n_fft, n_mels=n_mels)
+    mel_S = np.dot(mel_basis, np.abs(S)**2)
+
+    # Convert to log scale (dB) using the peak power as reference
+    log_mel_S = librosa.power_to_db(mel_S, ref=np.max)
+
+    return log_mel_S
 
 def _lws_processor():
     import lws
