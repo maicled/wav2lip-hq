@@ -260,7 +260,7 @@ def main():
 		args.audio = 'temp/temp.wav'
 
 	wav = audio.load_wav(args.audio, 16000)
-	mel = audio.melspectrogram(wav)
+        mel = audio.melspectrogram(wav, sr=16000)
 	print(mel.shape)
 
 	if np.isnan(mel.reshape(-1)).sum() > 0:
