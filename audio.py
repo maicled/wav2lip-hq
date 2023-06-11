@@ -42,7 +42,7 @@ def linearspectrogram(wav):
     return S
 
 def melspectrogram(y, sr):
-    S = librosa.feature.melspectrogram(y, sr=sr, n_mels=80, hop_length=256, n_fft=512, fmin=0, fmax=8000)
+    S = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=80, hop_length=256, n_fft=512, fmin=0, fmax=8000)
     return np.log10(np.maximum(S, 1e-10))
 
 def _lws_processor():
