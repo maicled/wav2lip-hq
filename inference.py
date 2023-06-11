@@ -30,7 +30,7 @@ parser.add_argument('--outfile', type=str, help='Video path to save result. See 
 
 
 parser.add_argument('--static', type=bool, 
-					help='If True, then use only first video frame for inference', default=False)
+					help='If True, then use only first video frame for inference', default=True)
 parser.add_argument('--fps', type=float, help='Can be specified only if input is a static image (default: 25)', 
 					default=25., required=False)
 
